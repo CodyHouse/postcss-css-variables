@@ -231,17 +231,17 @@ module.exports = postcss.plugin('postcss-css-variables', function(options) {
 			var rulesToWorkOn = [].concat(rule);
 			// Split out the rule into each comma separated selector piece
 			// We only need to split if is actually comma separted(selectors > 1)
-			if(rule.selectors.length > 1) {
-				// Reverse the selectors so that we can cloneAfter in the same comma separated order
-				rulesToWorkOn = rule.selectors.reverse().map(function(selector) {
-					var ruleClone = rule.cloneAfter();
-					ruleClone.selector = selector;
+			// if(rule.selectors.length > 1) {
+			// 	// Reverse the selectors so that we can cloneAfter in the same comma separated order
+			// 	rulesToWorkOn = rule.selectors.reverse().map(function(selector) {
+			// 		var ruleClone = rule.cloneAfter();
+			// 		ruleClone.selector = selector;
 
-					return ruleClone;
-				});
+			// 		return ruleClone;
+			// 	});
 
-				rule.remove();
-			}
+			// 	rule.remove();
+			// }
 
 			// Resolve the declarations
 			rulesToWorkOn.forEach(function(ruleToWorkOn) {
