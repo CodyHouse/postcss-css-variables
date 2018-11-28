@@ -25,12 +25,34 @@ var RE_VAR_PROP = (/(--(.+))/);
 function eachCssVariableDeclaration(css, cb) {
 	// Loop through all of the declarations and grab the variables and put them in the map
 	css.walkDecls(function(decl) {
+		var isUnderSupportsCss = declIsInCssSupportsRule(decl);
 		// If declaration is a variable
-		if(RE_VAR_PROP.test(decl.prop)) {
+		if(RE_VAR_PROP.test(decl.prop) && !isUnderSupportsCss) {
 			cb(decl);
 		}
 	});
 }
+
+function declIsInCssSupportsRule(decl) {
+	if(decl.parent && decl.parent.parent) {
+		return checkIsCssSupportsRule(decl.parent.parent);
+	}
+	return false;
+};
+
+function ruleIsInCssSupportsRule(rule) {
+	if(rule.parent) {
+		return checkIsCssSupportsRule(rule.parent);
+	}
+	return false;
+};
+
+function checkIsCssSupportsRule(node) {
+	if(node.type == 'atrule' && node.name === 'supports' && [].concat(node.params)[0].indexOf('--') > -1) {
+		return true;
+	}
+	return false;
+};
 
 
 
@@ -209,6 +231,9 @@ module.exports = postcss.plugin('postcss-css-variables', function(options) {
 		// Collect all the rules that have declarations that use variables
 		var rulesThatHaveDeclarationsWithVariablesList = [];
 		css.walkRules(function(rule) {
+			if(ruleIsInCssSupportsRule(rule)) {
+				return false;
+			}
 			var doesRuleUseVariables = rule.nodes.some(function(node) {
 				if(node.type === 'decl') {
 					var decl = node;
