@@ -231,24 +231,23 @@ module.exports = postcss.plugin('postcss-css-variables', function(options) {
 		// Collect all the rules that have declarations that use variables
 		var rulesThatHaveDeclarationsWithVariablesList = [];
 		css.walkRules(function(rule) {
-			if(ruleIsInCssSupportsRule(rule)) {
-				return false;
-			}
-			var doesRuleUseVariables = rule.nodes.some(function(node) {
-				if(node.type === 'decl') {
-					var decl = node;
-					// If it uses variables
-					// and is not a variable declarations that we may be preserving from earlier
-					if(resolveValue.RE_VAR_FUNC.test(decl.value) && !RE_VAR_PROP.test(decl.prop)) {
-						return true;
+			if(!ruleIsInCssSupportsRule(rule)) {
+				var doesRuleUseVariables = rule.nodes.some(function(node) {
+					if(node.type === 'decl') {
+						var decl = node;
+						// If it uses variables
+						// and is not a variable declarations that we may be preserving from earlier
+						if(resolveValue.RE_VAR_FUNC.test(decl.value) && !RE_VAR_PROP.test(decl.prop)) {
+							return true;
+						}
 					}
+
+					return false;
+				});
+
+				if(doesRuleUseVariables) {
+					rulesThatHaveDeclarationsWithVariablesList.push(rule);
 				}
-
-				return false;
-			});
-
-			if(doesRuleUseVariables) {
-				rulesThatHaveDeclarationsWithVariablesList.push(rule);
 			}
 		});
 
