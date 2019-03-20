@@ -50,6 +50,9 @@ function ruleIsInCssSupportsRule(rule) {
 function checkIsCssSupportsRule(node) {
 	if(node.type == 'atrule' && node.name === 'supports' && [].concat(node.params)[0].indexOf('--') > -1) {
 		return true;
+	} else if(node.parent) {
+		// this checks for multiple nesting -> e.g, @include breakpoint inside @support
+		return checkIsCssSupportsRule(node.parent);
 	}
 	return false;
 };
